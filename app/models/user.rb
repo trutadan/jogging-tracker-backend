@@ -9,9 +9,14 @@ class User < ApplicationRecord
                         uniqueness: true
 
     has_secure_password
-    validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
+    VALID_PASSWORD_REGEX = /\A^(?=\S*?[a-z])(?=\S*?[A-Z])(?=\S*?\d)(?=\S*?[\W_])/
+    validates :password, presence: true, length: { minimum: 8 }, 
+                        format: { with: VALID_PASSWORD_REGEX, message: "must include at least one lowercase letter, one uppercase letter, one digit, and one special character"},
+                        allow_nil: true
 
     enum role: [:regular, :user_manager, :admin]
+
+    has_many :time_entries, dependent: :destroy
 
     # Returns true if the given token matches the digest.
     def authenticated?(attribute, token)

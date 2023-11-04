@@ -26,7 +26,7 @@ module Backend
 
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
-    Rails.application.config.jwt_secret_key = 'a6a07f3b26f19f42f858394e913851be2922d316797b6605aa5924f54dce12ca00805baa7933dbfd16cc64326d4a40a2ad173a7b9925d4660ac423e7f0fd51aa'
+    Rails.application.config.jwt_secret_key = "51c66184a67e3f75a6a1022f675e753f1152974d6c6814ebbdeb9e47e0f8e5de4854430594ba08cc0ef1e3961bb703a0a09a11a95f3381e380888217caaec5f6"
     
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true

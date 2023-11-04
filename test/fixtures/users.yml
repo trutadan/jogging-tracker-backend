@@ -3,23 +3,23 @@
 regular_one:
   username: john_doe
   email: john.doe@example.com
-  password_digest: <%= BCrypt::Password.create('password123') %>
+  password_digest: <%= BCrypt::Password.create('Pa$$w0rd') %>
   role: regular
 
 regular_two:
   username: jane_doe
   email: jane.doe@example.com
-  password_digest: <%= BCrypt::Password.create('password123') %>
+  password_digest: <%= BCrypt::Password.create('Pa$$w0rd') %>
   role: regular
 
 user_manager_one:
   username: jane_smith
   email: jane.smith@example.com
-  password_digest: <%= BCrypt::Password.create('password123') %>
+  password_digest: <%= BCrypt::Password.create('Pa$$w0rd') %>
   role: user_manager
 
 admin_one:
   username: alice_jones
   email: alice.jones@example.com
-  password_digest: <%= BCrypt::Password.create('password123') %>
+  password_digest: <%= BCrypt::Password.create('Pa$$w0rd') %>
   role: admin

@@ -13,7 +13,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     test 'should return authorized for valid login' do
-        post login_path, params: { email: @user.email, password: 'password123' }
+        post login_path, params: { email: @user.email, password: 'Pa$$w0rd' }
         assert_response :ok
     end
 end
