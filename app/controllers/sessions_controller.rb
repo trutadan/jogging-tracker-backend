@@ -3,17 +3,10 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by(email: params[:email].downcase)
     if user&.authenticate(params[:password])
-      log_in user
-      params[:remember_me] == '1' ? remember(user) : forget(user)
-      render json: { message: 'Logged in successfully' }
+      token = log_in(user)
+      render json: { message: 'Logged in successfully', token: token, user_id: user.id, username: user.username, role: user.role }, status: :ok
     else
       render json: { error: 'Invalid email or password' }, status: :unauthorized
     end
-  end
-
-  # DELETE /logout
-  def destroy
-    log_out if logged_in?
-    render json: { message: 'Logged out successfully' }
   end
 end

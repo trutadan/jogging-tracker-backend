@@ -1,51 +1,29 @@
 module SessionsHelper
-    # Logs in the given user.
+    # Logs in the user and returns a JWT token.
     def log_in(user)
-        session[:user_id] = user.id
+        JWT.encode({ user_id: user.id }, Rails.application.config.jwt_secret_key, 'HS256')
     end
 
-    # Remembers a user in a persistent session.
-    def remember(user)
-        user.remember
-        cookies.encrypted[:user_id] = {
-            value: user.id,
-            expires: 1.day.from_now.utc
-        }
-        cookies[:remember_token] = {
-            value: user.remember_token,
-            expires: 1.day.from_now.utc
-        }
-    end
-
-    # Returns the user corresponding to the remember token cookie.
     def current_user
-        if (user_id = session[:user_id])
-            @current_user ||= User.find_by(id: user_id)
-        elsif (user_id = cookies.encrypted[:user_id])
-            user = User.find_by(id: user_id)
-            if user && user.authenticated?(cookies[:remember_token])
-                log_in user
-                @current_user = user
+        if request.headers['Authorization'].present?
+            token = request.headers['Authorization'].split(' ').last
+            begin
+                decoded_token = JWT.decode(token, Rails.application.config.jwt_secret_key, true, { algorithm: 'HS256' })
+                user_id = decoded_token.first['user_id']
+                @current_user ||= User.find_by(id: user_id)
+            rescue JWT::DecodeError
+                @current_user = nil
             end
         end
-    end    
+    end        
 
     def logged_in?
         !current_user.nil?
     end
 
-    # Forgets a persistent session.
-    def forget(user)
-        user.forget
-        cookies.delete(:user_id)
-        cookies.delete(:remember_token)
-    end
-
-    # Logs out the current user.
-    def log_out
-        forget(current_user)
-        session.delete(:user_id)
-        @current_user = nil
+    # Returns true if the given user is the current user.
+    def current_user?(user)
+        user && user == current_user
     end
 end
     

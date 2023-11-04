@@ -11,14 +11,9 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
-    # Returns true if a test user is logged in.
-    def is_logged_in?
-      !session[:user_id].nil?
-    end
-
-    # Log in as a particular user.
+    # Logs in the user and returns a JWT token.
     def log_in_as(user)
-      session[:user_id] = user.id
+        JWT.encode({ user_id: user.id }, Rails.application.config.jwt_secret_key, 'HS256')
     end
   end
 end
