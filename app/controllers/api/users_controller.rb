@@ -1,4 +1,4 @@
-class UsersController < ApplicationController
+class API::UsersController < ApplicationController
   before_action :require_authentication, except: [:create]
 
   # GET /users
@@ -65,3 +65,4 @@ class UsersController < ApplicationController
       params.require(:user).permit(:username, :email, :password, :password_confirmation)
     end
 end
+

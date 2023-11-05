@@ -1,4 +1,4 @@
-class SessionsController < ApplicationController
+class API::SessionsController < ApplicationController
   # POST /login
   def create
     user = User.find_by(email: params[:email].downcase)

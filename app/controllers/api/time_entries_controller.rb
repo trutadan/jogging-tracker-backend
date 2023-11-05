@@ -1,4 +1,4 @@
-class TimeEntriesController < ApplicationController
+class API::TimeEntriesController < ApplicationController
     before_action :require_authentication
     before_action :require_admin, only: [:index_admin, :create_admin]
 
@@ -78,10 +78,10 @@ class TimeEntriesController < ApplicationController
     def filter_by_dates
         start_date = params[:start_date]
         end_date = params[:end_date]
-      
+    
         time_entries = current_user.time_entries.where(date: start_date..end_date)
         render json: time_entries
-      end
+    end
     
     # GET /entries/weekly_reports
     def weekly_reports

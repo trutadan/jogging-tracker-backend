@@ -1,6 +1,6 @@
 require "test_helper"
 
-class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
+class API::TimeEntriesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @time_entry = time_entries(:one)
     @user = users(:regular_one)
@@ -12,7 +12,7 @@ class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
     token = log_in_as(@user)
     headers = { 'Authorization' => "Bearer #{token}" }
 
-    get time_entries_url, headers: headers, as: :json
+    get api_time_entries_url, headers: headers, as: :json
     assert_response :success
   end
 
@@ -20,7 +20,7 @@ class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
     token = log_in_as(@admin)
     headers = { 'Authorization' => "Bearer #{token}" }
 
-    get entries_admin_time_entries_path, headers: headers, as: :json
+    get admin_api_time_entries_url, headers: headers, as: :json
     assert_response :success
   end
 
@@ -28,7 +28,7 @@ class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
     token = log_in_as(@user)
     headers = { 'Authorization' => "Bearer #{token}" }
 
-    get time_entry_url(@time_entry), headers: headers, as: :json
+    get api_time_entry_url(@time_entry), headers: headers, as: :json
     assert_response :success
   end
 
@@ -45,7 +45,7 @@ class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
     }
   
     assert_difference('TimeEntry.count') do
-      post time_entries_url, headers: headers, params: time_entry_params, as: :json
+      post api_time_entries_url, headers: headers, params: time_entry_params, as: :json
     end
   
     assert_response :created
@@ -65,7 +65,7 @@ class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference('TimeEntry.count') do
-      post entries_admin_time_entries_path, headers: headers, params: time_entry_params, as: :json
+      post admin_api_time_entries_url, headers: headers, params: time_entry_params, as: :json
     end
 
     assert_response :created
@@ -82,7 +82,7 @@ class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
       seconds: 0
     }
 
-    patch time_entry_url(@time_entry), headers: headers, params: time_entry_params, as: :json
+    patch api_time_entry_url(@time_entry), headers: headers, params: time_entry_params, as: :json
     assert_response :success
     @time_entry.reload
     assert_equal 2.5, @time_entry.distance
@@ -100,7 +100,7 @@ class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
       seconds: 0
     }
 
-    patch time_entry_url(@time_entry), headers: headers, params: time_entry_params, as: :json
+    patch api_time_entry_url(@time_entry), headers: headers, params: time_entry_params, as: :json
     assert_response :unauthorized
   end
 
@@ -109,7 +109,7 @@ class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
     headers = { 'Authorization' => "Bearer #{token}" }
 
     assert_difference('TimeEntry.count', -1) do
-      delete time_entry_url(@time_entry), headers: headers, as: :json
+      delete api_time_entry_url(@time_entry), headers: headers, as: :json
     end
 
     assert_response :success
@@ -119,7 +119,7 @@ class TimeEntriesControllerTest < ActionDispatch::IntegrationTest
     token = log_in_as(@other_user)
     headers = { 'Authorization' => "Bearer #{token}" }
 
-    delete time_entry_url(@time_entry), headers: headers, as: :json
+    delete api_time_entry_url(@time_entry), headers: headers, as: :json
     assert_response :unauthorized
   end
 end
