@@ -2,19 +2,31 @@ class API::TimeEntriesController < ApplicationController
     before_action :require_authentication
     before_action :require_admin, only: [:index_admin, :create_admin]
 
-    # GET /entries
+    # GET /time_entries
     def index
-        @time_entries = current_user.time_entries.order(:date).paginate(page: params[:page], per_page: 25)
-        render json: @time_entries
+        if params[:start_date].present? && params[:end_date].present?
+            start_date = params[:start_date]
+            end_date = params[:end_date]
+            @time_entries = current_user.time_entries.where(date: start_date..end_date).order(:date).paginate(page: params[:page], per_page: 25)
+        else
+            @time_entries = current_user.time_entries.order(:date).paginate(page: params[:page], per_page: 25)
+        end
+
+        total_pages = @time_entries.total_pages
+        
+        render json: {
+            time_entries: @time_entries,
+            total_pages: total_pages
+        }
     end
     
-    # GET /entries/admin
+    # GET /time_entries/admin
     def index_admin
         @time_entries = TimeEntry.all.order(:date).paginate(page: params[:page], per_page: 25)
         render json: @time_entries
     end
 
-    # GET /entries/1
+    # GET /time_entries/1
     def show
         @time_entry = TimeEntry.find(params[:id])
         
@@ -25,7 +37,7 @@ class API::TimeEntriesController < ApplicationController
         end
     end
 
-    # POST /entries
+    # POST /time_entries
     def create
         @time_entry = current_user.time_entries.new(time_entry_params)
 
@@ -36,7 +48,7 @@ class API::TimeEntriesController < ApplicationController
         end
     end
 
-    # POST /entries/admin
+    # POST /time_entries/admin
     def create_admin
         @time_entry = TimeEntry.new(extended_time_entry_params)
         
@@ -47,7 +59,7 @@ class API::TimeEntriesController < ApplicationController
         end
     end
 
-    # PATCH/PUT /entries/1
+    # PATCH/PUT /time_entries/1
     def update
         @time_entry = TimeEntry.find(params[:id])
 
@@ -62,7 +74,7 @@ class API::TimeEntriesController < ApplicationController
         end
     end
 
-    # DELETE /entries/1
+    # DELETE /time_entries/1
     def destroy
         @time_entry = TimeEntry.find(params[:id])
 
@@ -74,29 +86,39 @@ class API::TimeEntriesController < ApplicationController
         end
     end
     
-    # GET /entries/filtered_by_dates
-    def filter_by_dates
-        start_date = params[:start_date]
-        end_date = params[:end_date]
-    
-        time_entries = current_user.time_entries.where(date: start_date..end_date)
-        render json: time_entries
-    end
-    
-    # GET /entries/weekly_reports
+    # GET /time_entries/weekly_reports
     def weekly_reports
         time_entries = current_user.time_entries
 
         entries_by_week = time_entries.group_by { |entry| entry.date.strftime('%U-%Y') }
 
         weekly_averages = entries_by_week.map do |week, entries|
-            average_speed = entries.sum(&:speed) / entries.size
-            average_distance = entries.sum(&:distance) / entries.size
+            total_distance = entries.sum(&:distance)
+            average_distance = total_distance / entries.size
+
+            total_time = entries.sum { |entry| entry.hours * 3600 + entry.minutes * 60 + entry.seconds }
+
+            average_speed = total_distance / total_time * 3600
 
             { week: week, average_speed: average_speed, average_distance: average_distance }
         end
 
-        render json: weekly_averages
+        weekly_averages = weekly_averages.sort_by { |average| [average[:week].split('-').last, average[:week].split('-').first] }.reverse
+
+        page = params[:page] || 1
+        per_page = 25
+        total_entries = weekly_averages.length
+      
+        @paginated_averages = WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
+          pager.replace(weekly_averages[pager.offset, pager.per_page])
+        end
+        
+        @total_pages = (total_entries / per_page).floor + 1
+
+        render json: {
+            weekly_averages: @paginated_averages,
+            total_pages: @total_pages
+        }
     end
 
     private
