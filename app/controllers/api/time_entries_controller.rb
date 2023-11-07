@@ -12,11 +12,11 @@ class API::TimeEntriesController < ApplicationController
             @time_entries = current_user.time_entries.order(:date).paginate(page: params[:page], per_page: 25)
         end
 
-        total_pages = @time_entries.total_pages
+        @total_pages = @time_entries.total_pages
         
         render json: {
             time_entries: @time_entries,
-            total_pages: total_pages
+            total_pages: @total_pages
         }
     end
     
