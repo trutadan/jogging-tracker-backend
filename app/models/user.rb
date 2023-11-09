@@ -15,6 +15,8 @@ class User < ApplicationRecord
                         allow_nil: true
 
     enum role: [:regular, :user_manager, :admin]
+    before_validation :set_default_role, on: :create
+    validates :role, presence: true, inclusion: { in: roles.keys }
 
     has_many :time_entries, dependent: :destroy
 
@@ -34,5 +36,10 @@ class User < ApplicationRecord
     # Returns a random token.
     def self.new_token
         SecureRandom.urlsafe_base64
+    end
+
+    # Sets the default role to regular, if not already set.
+    def set_default_role
+        self.role ||= :regular
     end
 end

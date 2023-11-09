@@ -4,6 +4,7 @@ module SessionsHelper
         JWT.encode({ user_id: user.id }, Rails.application.config.jwt_secret_key, 'HS256')
     end
 
+    # Gets the current user from the JWT token.
     def current_user
         if request.headers['Authorization'].present?
             token = request.headers['Authorization'].split(' ').last
@@ -17,6 +18,7 @@ module SessionsHelper
         end
     end        
 
+    # Returns true if the user is logged in, false otherwise.
     def logged_in?
         !current_user.nil?
     end

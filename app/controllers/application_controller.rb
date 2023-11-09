@@ -17,4 +17,8 @@ class ApplicationController < ActionController::API
         def require_admin
             render_unauthorized("You do not have permission to perform this action.") unless current_user&.admin?
         end
+
+        def render_not_found(message = 'Not Found')
+            render json: { error: message }, status: :not_found
+        end
 end
