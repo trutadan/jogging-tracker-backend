@@ -6,6 +6,8 @@ Rails.application.routes.draw do
     
     resources :users
 
+    resources :password_resets, only: [:create, :update]
+
     resources :time_entries do
       collection do
         get '/admin', to: 'time_entries#index_admin'

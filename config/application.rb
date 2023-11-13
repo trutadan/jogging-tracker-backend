@@ -6,6 +6,8 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+Dotenv::Railtie.load
+
 module Backend
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -26,7 +28,7 @@ module Backend
 
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
-    Rails.application.config.jwt_secret_key = "51c66184a67e3f75a6a1022f675e753f1152974d6c6814ebbdeb9e47e0f8e5de4854430594ba08cc0ef1e3961bb703a0a09a11a95f3381e380888217caaec5f6"
+    Rails.application.config.jwt_secret_key = ENV['JWT_SECRET_KEY']
     
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true

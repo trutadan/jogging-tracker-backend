@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+    attr_accessor :reset_token
+    
     before_save { self.email = email.downcase }
 
     validates :username, presence: true, length: { maximum: 25 },
@@ -41,5 +43,23 @@ class User < ApplicationRecord
     # Sets the default role to regular, if not already set.
     def set_default_role
         self.role ||= :regular
+    end
+
+    # Sets the password reset attributes.
+    def create_reset_digest
+        self.reset_token = User.new_token
+        update_attribute(:reset_digest, User.digest(reset_token))
+        update_attribute(:reset_sent_at, Time.zone.now)
+    end
+
+    # Sends password reset email.
+    def send_password_reset_email
+        UserMailer.password_reset(self).deliver_now
+    end
+
+    # Resets the password.
+    def reset_password(params)
+        self.update(params)      
+        self.update(reset_digest: nil, reset_sent_at: nil)    
     end
 end
